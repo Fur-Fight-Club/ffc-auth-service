@@ -14,7 +14,7 @@ services:
       - MYSQL_USER=${MYSQL_USER}
     container_name: ffc-auth-db
     volumes:
-      - db:/var/lib/mysql
+      - ./db:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   nestjs:
