@@ -37,3 +37,4 @@ lerna-debug.log*
 # project
 package-lock.json
 .env
+.npm
