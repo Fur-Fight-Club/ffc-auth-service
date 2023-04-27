@@ -14,7 +14,7 @@ RUN apt-get update && \
 # Copy current directory to APP folder
 COPY . .
 
-EXPOSE 3002
+EXPOSE 3000
 EXPOSE 3306
 
 CMD ["npm", "run", "start:dev"]

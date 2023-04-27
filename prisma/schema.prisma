@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "debian-openssl-1.0.x", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -10,18 +11,146 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AnimalType {
+  id        Int            @id @unique @default(autoincrement())
+  type_name AnimalTypeName
+  Animal    Animal[]
+}
+
+model WeightCategory {
+  id            Int                @id @unique @default(autoincrement())
+  category_name WeightCategoryName
+  Animal        Animal[]
+}
+
+model Animal {
+  id                 Int            @id @unique @default(autoincrement())
+  name               String
+  weight             Float
+  fk_weight_category WeightCategory @relation(fields: [weightCategoryId], references: [id])
+  fk_user            Int
+  fk_type            AnimalType     @relation(fields: [animalTypeId], references: [id])
+  weightCategoryId   Int
+  animalTypeId       Int
+  Fighter            Fighter[]
+}
+
+model Fighter {
+  id               Int                @id @unique @default(autoincrement())
+  fk_animal        Animal             @relation(fields: [animalId], references: [id])
+  odds             Float
+  animalId         Int
+  MatchWaitingList MatchWaitingList[]
+  MatchFighter1    Match[]            @relation(name: "fk_Match_Fighter1")
+  MatchFighter2    Match[]            @relation(name: "fk_Match_Fighter2")
+}
+
+model MatchWaitingList {
+  id         Int                    @id @unique @default(autoincrement())
+  fk_match   Match                  @relation(fields: [matchId], references: [id])
+  fk_fighter Fighter                @relation(fields: [fighterId], references: [id])
+  status     MatchWaitingListStatus @default(PENDING)
+  matchId    Int
+  fighterId  Int
+}
+
+model Match {
+  id               Int                @id @unique @default(autoincrement())
+  Fighter1         Fighter            @relation(references: [id], fields: [fighter1], name: "fk_Match_Fighter1")
+  Fighter2         Fighter?           @relation(references: [id], fields: [fighter2], name: "fk_Match_Fighter2")
+  matchStartDate   DateTime
+  matchEndDate     DateTime?
+  fk_arena         Arena              @relation(fields: [arenaId], references: [id])
+  MatchWaitingList MatchWaitingList[]
+  fighter1         Int
+  fighter2         Int?
+  arenaId          Int
+}
+
+model Arena {
+  id       Int     @id @unique @default(autoincrement())
+  name     String
+  address  String
+  address2 String?
+  city     String
+  zipcode  String
+  country  String
+  Match    Match[]
+}
+
+enum AnimalTypeName {
+  DOG
+  CAT
+  RABBIT
+  HORSE
+}
+
+enum WeightCategoryName {
+  A_FINE_BOI
+  HE_CHOMNK
+  A_HECKING_CHONKER
+  HEFTY_CHONK
+  MEGA_CHONKER
+  OH_LAWD_HE_COMIN
+}
+
+enum MatchWaitingListStatus {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
+
 model User {
-  id          Int     @id @unique @default(autoincrement())
-  email       String  @unique
+  id          Int       @id @unique @default(autoincrement())
+  email       String    @unique
   firstname   String
   lastname    String
   password    String
-  role        Roles   @default(USER)
+  role        Roles     @default(USER)
   email_token String?
+  Invoice     Invoice[]
 }
 
 enum Roles {
   ADMIN
   USER
   ANIMAL_OWNER
+}
+
+model Wallet {
+  id          Int           @id @unique @default(autoincrement())
+  fk_user     Int
+  amount      Float
+  Transaction Transaction[]
+}
+
+model Invoice {
+  id          Int           @id @unique @default(autoincrement())
+  amount      Float
+  User        User          @relation(fields: [fk_user], references: [id])
+  fk_user     Int
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id         Int             @id @unique @default(autoincrement())
+  type       TransactionType
+  tag        TransactionTag
+  amount     Float
+  fk_wallet  Wallet          @relation(fields: [walletId], references: [id])
+  fk_invoice Invoice         @relation(fields: [invoiceId], references: [id])
+  walletId   Int
+  invoiceId  Int
+}
+
+enum TransactionType {
+  IN
+  OUT
+}
+
+enum TransactionTag {
+  WITHDRAW
+  BUY_CREDIT
+  FEE
+  BET
 }
