@@ -1,6 +1,4 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-
 import { PrismaClient as PrismaClientPackage } from "ffc-prisma-package/dist/client"
 
 @Injectable()
