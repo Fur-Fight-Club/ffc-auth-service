@@ -1,10 +1,15 @@
 import { Request } from "express";
-import { UserRole } from "src/user/dto/user.dto";
+import { UserRole } from "src/user/users.schema";
 
 export interface JWTServicePayload {
   iss: string; // Issuer
   aud: string; // Audience
-  sub: "ffc-analytics-service" | "ffc-auth-service" | "ffc-main-service" | "ffc-notifications-service" | "ffc-payments-service"; // Authorized services 
+  sub:
+    | "ffc-analytics-service"
+    | "ffc-auth-service"
+    | "ffc-main-service"
+    | "ffc-notifications-service"
+    | "ffc-payments-service"; // Authorized services
 }
 
 export interface JWTUserPayload {
@@ -12,7 +17,7 @@ export interface JWTUserPayload {
   aud: string; // Audience
   sub: number; // User id
   // Add more properties ?
-  role: UserRole
+  role: UserRole;
 }
 
 export interface JWTServiceRequest extends Request {
