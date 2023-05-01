@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import * as fs from "fs";
 
 import { UserRole } from "src/user/users.schema";
-import { JWTUserPayload } from "./auth.model";
+import { JWTUserPayload } from "./auth.schema";
 
 @Injectable()
 export class AuthService {
