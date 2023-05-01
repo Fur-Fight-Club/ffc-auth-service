@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ServerHealthcheck } from "./app.model";
+import { ServerHealthcheck } from "./app.schema";
 import { PrismaService } from "./services/prisma.service";
 
 @Injectable()

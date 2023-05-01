@@ -131,7 +131,10 @@ export class UserController {
   }
 
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() data: UpdateUserDto) {
+  async update(
+    @Param("id") id: string,
+    @Body(ZodValidationPipe) data: UpdateUserDto
+  ) {
     return await this.userService.update(data);
   }
 

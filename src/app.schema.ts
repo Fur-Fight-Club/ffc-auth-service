@@ -1,3 +1,4 @@
+import { createZodDto } from "nestjs-zod";
 import { z } from "nestjs-zod/z";
 
 export const serverHealthcheckSchema = z.object({
@@ -7,3 +8,5 @@ export const serverHealthcheckSchema = z.object({
 });
 
 export type ServerHealthcheck = z.infer<typeof serverHealthcheckSchema>;
+
+export class ServerHealCheckDto extends createZodDto(serverHealthcheckSchema) {}

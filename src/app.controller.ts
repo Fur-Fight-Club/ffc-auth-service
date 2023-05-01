@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ServerHealthcheck } from "./app.model";
+import { ServerHealCheckDto } from "./app.schema";
 import { AppService } from "./app.service";
 
 @Controller()
@@ -11,7 +11,7 @@ export class AppController {
   @ApiResponse({
     description:
       "Checking the health of the server and database. Mainly for AWS healthchecks.",
-    type: ServerHealthcheck,
+    type: ServerHealCheckDto,
   })
   @Get("ping")
   async healthcheck(): Promise<object> {
