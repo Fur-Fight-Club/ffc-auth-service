@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
@@ -33,6 +33,17 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
+    // Check if user already exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        email: createUserDto.email,
+      },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('User already exists');
+    }
+
     const user = await this.prisma.user.create({
       data: {
         firstname: createUserDto.firstname,
