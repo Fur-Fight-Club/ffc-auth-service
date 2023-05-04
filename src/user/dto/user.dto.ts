@@ -21,5 +21,5 @@ export class UserDto {
 export enum UserRole {
   ADMIN = "ADMIN",
   USER = "USER",
-  ANIMAL_OWNER = "ANIMAL_OWNER"
+  MONSTER_OWNER = "MONSTER_OWNER"
 }
