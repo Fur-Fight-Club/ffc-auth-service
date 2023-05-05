@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ServiceGuard } from 'src/auth/auth-service.guard';
+import { ConfirmAccountDto } from './users.schema';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @ApiHeader({
   name: 'x-service-auth',
@@ -35,6 +37,13 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.create(createUserDto);
   }
+
+  @UseGuards(ServiceGuard)
+  @Post("confirm-account")
+  async confirmAccount(@Body(ZodValidationPipe) confirmAccountDto: ConfirmAccountDto) {
+    return await this.userService.confirmAccount(confirmAccountDto.email_token);
+  }
+
 
   @Get()
   async findAll() {

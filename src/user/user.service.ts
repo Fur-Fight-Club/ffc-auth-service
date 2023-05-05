@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
@@ -140,6 +140,33 @@ export class UserService {
     });
     return true;
 
+  }
+
+  async confirmAccount(email_token: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email_token: email_token,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const confirmedUser = await this.prisma.user.update({
+      where: {
+        email_token: email_token,
+      },
+      data: {
+        email_token: null
+      },
+    });
+
+    if (!confirmedUser) {
+      throw new InternalServerErrorException('Error while confirming user');
+    }
+
+    return true;
   }
 
 
