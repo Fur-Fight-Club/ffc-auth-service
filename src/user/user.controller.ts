@@ -44,6 +44,11 @@ export class UserController {
     type: ConfirmAccountApiBody,
     description: "Confirm user's account with email token"
   })
+  @ApiResponse({
+    status: 200,
+    description: "Account confirmed successfully",
+    type: Boolean
+  })
   async confirmAccount(@Body(ZodValidationPipe) confirmAccountDto: ConfirmAccountDto): ConfirmAccountResponse {
     return await this.userService.confirmAccount(confirmAccountDto.email_token);
   }
