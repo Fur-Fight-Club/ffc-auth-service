@@ -7,6 +7,7 @@ import { PrismaService } from 'src/services/prisma.service';
 import { password } from 'src/utils/password.utils';
 import { AuthService } from 'src/auth/auth.service';
 import { generateUUID } from 'src/utils/functions.utils';
+import { ConfirmAccountResponse } from './users.schema';
 
 @Injectable()
 export class UserService {
@@ -142,7 +143,7 @@ export class UserService {
 
   }
 
-  async confirmAccount(email_token: string): Promise<boolean> {
+  async confirmAccount(email_token: string): ConfirmAccountResponse {
     const user = await this.prisma.user.findUnique({
       where: {
         email_token: email_token,

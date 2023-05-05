@@ -16,3 +16,5 @@ export class ConfirmAccountApiBody {
   @ApiProperty({ type: "string", default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" })
   email_token: string;
 }
+
+export type ConfirmAccountResponse = Promise<boolean>;

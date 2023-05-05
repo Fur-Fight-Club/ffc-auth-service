@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ServiceGuard } from 'src/auth/auth-service.guard';
-import { ConfirmAccountApiBody, ConfirmAccountDto } from './users.schema';
+import { ConfirmAccountApiBody, ConfirmAccountDto, ConfirmAccountResponse } from './users.schema';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 @ApiHeader({
@@ -44,7 +44,7 @@ export class UserController {
     type: ConfirmAccountApiBody,
     description: "Confirm user's account with email token"
   })
-  async confirmAccount(@Body(ZodValidationPipe) confirmAccountDto: ConfirmAccountDto) {
+  async confirmAccount(@Body(ZodValidationPipe) confirmAccountDto: ConfirmAccountDto): ConfirmAccountResponse {
     return await this.userService.confirmAccount(confirmAccountDto.email_token);
   }
 
