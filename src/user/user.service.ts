@@ -1,17 +1,29 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
-import { UserDto, UserRole } from './dto/user.dto';
-import { PrismaService } from 'src/services/prisma.service';
-import { password } from 'src/utils/password.utils';
-import { AuthService } from 'src/auth/auth.service';
-import { generateUUID } from 'src/utils/functions.utils';
-import { AskResetPasswordResponse, ConfirmAccountResponse } from './users.schema';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { LoginUserDto, LoginUserResponseDto } from "./dto/login-user.dto";
+import { UserDto, UserRole } from "./dto/user.dto";
+import { PrismaService } from "src/services/prisma.service";
+import { password } from "src/utils/password.utils";
+import { AuthService } from "src/auth/auth.service";
+import { generateUUID } from "src/utils/functions.utils";
+import {
+  AskResetPasswordResponse,
+  ConfirmAccountResponse,
+} from "./users.schema";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService, private readonly authService: AuthService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authService: AuthService
+  ) {}
 
   async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto> {
     const user = await this.prisma.user.findUnique({
@@ -21,13 +33,16 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
-    const isPasswordValid = await password.verify(loginUserDto.password, user.password);
+    const isPasswordValid = await password.verify(
+      loginUserDto.password,
+      user.password
+    );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     return this.authService.generateUserToken(user.id, user.role as UserRole);
@@ -42,7 +57,7 @@ export class UserService {
     });
 
     if (existingUser) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException("User already exists");
     }
 
     const user = await this.prisma.user.create({
@@ -52,7 +67,7 @@ export class UserService {
         email: createUserDto.email,
         password: await password.hash(createUserDto.password),
         role: "USER",
-        email_token: generateUUID()
+        email_token: generateUUID(),
       },
     });
 
@@ -63,7 +78,7 @@ export class UserService {
       email: user.email,
       role: user.role as UserRole,
       password: "redacted",
-      email_token: user.email_token
+      email_token: user.email_token,
     };
   }
 
@@ -78,13 +93,12 @@ export class UserService {
         email: user.email,
         role: user.role as UserRole,
         password: "redacted",
-        email_token: user.email_token
+        email_token: user.email_token,
       };
     });
   }
 
   async findOne(id: number): Promise<UserDto> {
-
     const user = await this.prisma.user.findUnique({
       where: {
         id: id,
@@ -92,7 +106,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     return {
@@ -102,12 +116,13 @@ export class UserService {
       email: user.email,
       role: user.role as UserRole,
       password: "redacted",
-      email_token: user.email_token
+      email_token: user.email_token,
     };
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
-    const { firstname, lastname, email, password, role, email_token } = updateUserDto;
+    const { firstname, lastname, email, password, role, email_token } =
+      updateUserDto;
     const user = await this.prisma.user.update({
       where: {
         id: id,
@@ -118,7 +133,7 @@ export class UserService {
         email: email,
         password: password,
         role: role,
-        email_token: email_token
+        email_token: email_token,
       },
     });
 
@@ -129,7 +144,7 @@ export class UserService {
       email: user.email,
       role: user.role as UserRole,
       password: "redacted",
-      email_token: user.email_token
+      email_token: user.email_token,
     };
   }
 
@@ -140,7 +155,6 @@ export class UserService {
       },
     });
     return true;
-
   }
 
   async confirmAccount(email_token: string): ConfirmAccountResponse {
@@ -151,7 +165,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     const confirmedUser = await this.prisma.user.update({
@@ -159,12 +173,12 @@ export class UserService {
         email_token: email_token,
       },
       data: {
-        email_token: null
+        email_token: null,
       },
     });
 
     if (!confirmedUser) {
-      throw new InternalServerErrorException('Error while confirming user');
+      throw new InternalServerErrorException("Error while confirming user");
     }
 
     return true;
@@ -178,7 +192,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     const updatedUser = await this.prisma.user.update({
@@ -186,18 +200,57 @@ export class UserService {
         email: email,
       },
       data: {
-        email_token: generateUUID()
+        email_token: generateUUID(),
       },
     });
 
     if (!updatedUser) {
-      throw new InternalServerErrorException('Error while asking reset password');
+      throw new InternalServerErrorException(
+        "Error while asking reset password"
+      );
     }
 
     return {
-      email_token: updatedUser.email_token
+      email_token: updatedUser.email_token,
     };
   }
 
+  async resetPassword(
+    email_token: string,
+    updatedPassword: string
+  ): Promise<UserDto> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email_token: email_token,
+      },
+    });
 
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        email_token: email_token,
+      },
+      data: {
+        password: await password.hash(updatedPassword),
+        email_token: null,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException("Error while reseting password");
+    }
+
+    return {
+      id: updatedUser.id,
+      firstname: updatedUser.firstname,
+      lastname: updatedUser.lastname,
+      email: updatedUser.email,
+      role: updatedUser.role as UserRole,
+      password: "redacted",
+      email_token: updatedUser.email_token,
+    };
+  }
 }
