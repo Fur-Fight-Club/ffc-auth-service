@@ -7,7 +7,7 @@ import { PrismaService } from 'src/services/prisma.service';
 import { password } from 'src/utils/password.utils';
 import { AuthService } from 'src/auth/auth.service';
 import { generateUUID } from 'src/utils/functions.utils';
-import { ConfirmAccountResponse } from './users.schema';
+import { AskResetPasswordResponse, ConfirmAccountResponse } from './users.schema';
 
 @Injectable()
 export class UserService {
@@ -168,6 +168,35 @@ export class UserService {
     }
 
     return true;
+  }
+
+  async askResetPassword(email: string): AskResetPasswordResponse {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        email_token: generateUUID()
+      },
+    });
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException('Error while asking reset password');
+    }
+
+    return {
+      email_token: updatedUser.email_token
+    };
   }
 
 

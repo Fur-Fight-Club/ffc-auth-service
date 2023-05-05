@@ -18,3 +18,27 @@ export class ConfirmAccountApiBody {
 }
 
 export type ConfirmAccountResponse = Promise<boolean>;
+
+/**
+ * ASK RESET PASSWORD TYPES
+ */
+export const askResetPassword = z.object({
+  email: z.string().email(),
+})
+
+export class AskResetPasswordDto extends createZodDto(askResetPassword) { }
+export type AskResetPasswordType = z.infer<typeof askResetPassword>;
+
+export class AskResetPasswordApiBody {
+  @ApiProperty({ type: "string", format: "email" })
+  email: string;
+}
+
+export class AskResetPasswordApiResponse {
+  @ApiProperty({ type: "string", default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" })
+  email_token: string;
+}
+
+export type AskResetPasswordResponse = Promise<{
+  email_token: string;
+}>;

@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ServiceGuard } from 'src/auth/auth-service.guard';
-import { ConfirmAccountApiBody, ConfirmAccountDto, ConfirmAccountResponse } from './users.schema';
+import { AskResetPasswordApiBody, AskResetPasswordApiResponse, AskResetPasswordDto, AskResetPasswordResponse, ConfirmAccountApiBody, ConfirmAccountDto, ConfirmAccountResponse } from './users.schema';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 @ApiHeader({
@@ -38,8 +38,8 @@ export class UserController {
     return await this.userService.create(createUserDto);
   }
 
-  @UseGuards(ServiceGuard)
   @Post("confirm-account")
+  @UseGuards(ServiceGuard)
   @ApiBody({
     type: ConfirmAccountApiBody,
     description: "Confirm user's account with email token"
@@ -48,6 +48,20 @@ export class UserController {
     return await this.userService.confirmAccount(confirmAccountDto.email_token);
   }
 
+  @Post("ask-reset-password")
+  @UseGuards(ServiceGuard)
+  @ApiBody({
+    type: AskResetPasswordApiBody,
+    description: "Ask for a password reset"
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Password reset asked successfully, returns email token",
+    type: AskResetPasswordApiResponse
+  })
+  async askResetPassword(@Body(ZodValidationPipe) askResetPasswordDto: AskResetPasswordDto): AskResetPasswordResponse {
+    return await this.userService.askResetPassword(askResetPasswordDto.email);
+  }
 
   @Get()
   async findAll() {
