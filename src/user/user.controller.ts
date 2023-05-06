@@ -122,12 +122,12 @@ export class UserController {
 
   @Get()
   async findAll() {
-    return await this.userService.findAll();
+    return await this.userService.getUsers();
   }
 
   @Get(":id")
   async findOne(@Body(ZodValidationPipe) data: GetUserDto) {
-    return await this.userService.findOne(data);
+    return await this.userService.getUser(data);
   }
 
   @Patch(":id")
