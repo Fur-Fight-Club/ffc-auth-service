@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "nestjs-zod/z";
 
-const userRoleSchema = z.enum(["ADMIN", "USER", "MONSTER_OWNER"]);
+export const userRoleSchema = z.enum(["ADMIN", "USER", "MONSTER_OWNER"]);
 
 export const userSchema = z.object({
   id: z.number(),
@@ -85,6 +85,10 @@ const updateUserSchema = userSchema.pick({
   email_token: true,
 });
 
+const removeUserSchema = userSchema.pick({
+  id: true,
+});
+
 export class CreateUserDto extends createZodDto(createUserSchema) {}
 
 export class LoginUserDto extends createZodDto(loginUserSchema) {}
@@ -94,6 +98,8 @@ export class LoginUserResponseDto extends createZodDto(
 ) {}
 
 export class UpdateUserDto extends createZodDto(updateUserSchema) {}
+
+export class RemoveUserDto extends createZodDto(removeUserSchema) {}
 
 export class GetUserDto extends createZodDto(getUserSchema) {}
 
