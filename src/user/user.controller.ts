@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   UseGuards,
@@ -30,6 +29,7 @@ import {
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
+  RemoveUserDto,
   ResetPasswordApiBody,
   ResetPasswordDto,
   UpdateUserDto,
@@ -63,7 +63,7 @@ export class UserController {
 
   @Post("register")
   async create(@Body(ZodValidationPipe) data: CreateUserDto) {
-    return await this.userService.create(data);
+    return await this.userService.createUser(data);
   }
 
   @Post("confirm-account")
@@ -80,7 +80,9 @@ export class UserController {
   async confirmAccount(
     @Body(ZodValidationPipe) confirmAccountDto: ConfirmAccountDto
   ): ConfirmAccountResponse {
-    return await this.userService.confirmAccount(confirmAccountDto.email_token);
+    return await this.userService.confirmAccountUser(
+      confirmAccountDto.email_token
+    );
   }
 
   @Post("ask-reset-password")
@@ -114,7 +116,7 @@ export class UserController {
   async resetPassword(
     @Body(ZodValidationPipe) resetPasswordDto: ResetPasswordDto
   ): Promise<UserDto> {
-    return await this.userService.resetPassword(
+    return await this.userService.resetPasswordUser(
       resetPasswordDto.email_token,
       resetPasswordDto.password
     );
@@ -122,24 +124,21 @@ export class UserController {
 
   @Get()
   async findAll() {
-    return await this.userService.findAll();
+    return await this.userService.getUsers();
   }
 
-  @Get(":id")
+  @Get("get")
   async findOne(@Body(ZodValidationPipe) data: GetUserDto) {
-    return await this.userService.findOne(data);
+    return await this.userService.getUser(data);
   }
 
-  @Patch(":id")
-  async update(
-    @Param("id") id: string,
-    @Body(ZodValidationPipe) data: UpdateUserDto
-  ) {
-    return await this.userService.update(data);
+  @Patch("update")
+  async update(@Body(ZodValidationPipe) data: UpdateUserDto) {
+    return await this.userService.updateUser(data);
   }
 
-  @Delete(":id")
-  async remove(@Param("id") id: string) {
-    return await this.userService.remove(+id);
+  @Delete("remove")
+  async remove(@Body(ZodValidationPipe) data: RemoveUserDto) {
+    return await this.userService.removeUser(data);
   }
 }

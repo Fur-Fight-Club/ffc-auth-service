@@ -8,6 +8,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/services/prisma.service";
 import { generateUUID } from "src/utils/functions.utils";
 import { password as passwordUtils } from "src/utils/password.utils";
+import { UsersRepository } from "./user.repository";
 import {
   AskResetPasswordResponse,
   ConfirmAccountResponse,
@@ -24,12 +25,13 @@ import {
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private repository: UsersRepository
   ) {}
 
-  async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto> {
-    const { email } = loginUserDto;
-    const user = await this.prisma.user.findUnique({
+  async login(params: LoginUserDto): Promise<LoginUserResponseDto> {
+    const { email } = params;
+    const user = await this.repository.getUser({
       where: {
         email,
       },
@@ -40,7 +42,7 @@ export class UserService {
     }
 
     const isPasswordValid = await passwordUtils.verify(
-      loginUserDto.password,
+      params.password,
       user.password
     );
 
@@ -51,73 +53,47 @@ export class UserService {
     return this.authService.generateUserToken(user.id, user.role as UserRole);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    const { firstname, lastname, email, password } = createUserDto;
-    const user = await this.prisma.user.create({
+  async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
+    const { firstname, lastname, email, password: passwordDto } = createUserDto;
+    const password = await passwordUtils.hash(passwordDto);
+    const email_token = generateUUID();
+    const user = await this.repository.createUser({
       data: {
         firstname,
         lastname,
         email,
-        password: await passwordUtils.hash(password),
+        password,
         role: "USER",
-        email_token: generateUUID(),
+        email_token,
       },
     });
-
-    return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role as UserRole,
-      password: "redacted",
-      email_token: user.email_token,
-    };
+    return user;
   }
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.prisma.user.findMany();
+  async getUsers(): Promise<UserDto[]> {
+    const users = await this.repository.getUsers({});
 
-    return users.map((user) => {
-      return {
-        id: user.id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        role: user.role as UserRole,
-        password: "redacted",
-        email_token: user.email_token,
-      };
+    return users.filter((user) => {
+      delete user.password;
+      return user;
     });
   }
 
-  async findOne(getUserDto: GetUserDto): Promise<UserDto> {
-    const { id } = getUserDto;
-    const user = await this.prisma.user.findUnique({
+  async getUser(params: GetUserDto): Promise<UserDto> {
+    const { id } = params;
+    const user = await this.repository.getUser({
       where: {
         id,
       },
     });
-
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-
-    return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role as UserRole,
-      password: "redacted",
-      email_token: user.email_token,
-    };
+    delete user.password;
+    return user;
   }
 
-  async update(updateUserDto: UpdateUserDto): Promise<UserDto> {
+  async updateUser(updateUserDto: UpdateUserDto): Promise<UserDto> {
     const { id, firstname, lastname, email, password, role, email_token } =
       updateUserDto;
-    const user = await this.prisma.user.update({
+    const user = await this.repository.updateUser({
       where: {
         id,
       },
@@ -131,28 +107,24 @@ export class UserService {
       },
     });
 
-    return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role as UserRole,
-      password: "redacted",
-      email_token: user.email_token,
-    };
+    delete user.password;
+    return user;
   }
 
-  remove(id: number): boolean {
-    const user = this.prisma.user.delete({
+  async removeUser(params: GetUserDto): Promise<UserDto> {
+    const { id } = params;
+    const user = await this.repository.deleteUser({
       where: {
-        id: id,
+        id,
       },
     });
-    return true;
+
+    delete user.password;
+    return user;
   }
 
-  async confirmAccount(email_token: string): ConfirmAccountResponse {
-    const user = await this.prisma.user.findUnique({
+  async confirmAccountUser(email_token: string): ConfirmAccountResponse {
+    const user = await this.repository.getUser({
       where: {
         email_token: email_token,
       },
@@ -162,7 +134,7 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const confirmedUser = await this.prisma.user.update({
+    const confirmedUser = await this.repository.updateUser({
       where: {
         email_token: email_token,
       },
@@ -179,7 +151,7 @@ export class UserService {
   }
 
   async askResetPassword(email: string): AskResetPasswordResponse {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.repository.getUser({
       where: {
         email: email,
       },
@@ -189,7 +161,7 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const updatedUser = await this.prisma.user.update({
+    const updatedUser = await this.repository.updateUser({
       where: {
         email: email,
       },
@@ -209,11 +181,11 @@ export class UserService {
     };
   }
 
-  async resetPassword(
+  async resetPasswordUser(
     email_token: string,
     updatedPassword: string
   ): Promise<UserDto> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.repository.getUser({
       where: {
         email_token: email_token,
       },
@@ -223,7 +195,7 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const updatedUser = await this.prisma.user.update({
+    const updatedUser = await this.repository.updateUser({
       where: {
         email_token: email_token,
       },
@@ -237,14 +209,7 @@ export class UserService {
       throw new InternalServerErrorException("Error while reseting password");
     }
 
-    return {
-      id: updatedUser.id,
-      firstname: updatedUser.firstname,
-      lastname: updatedUser.lastname,
-      email: updatedUser.email,
-      role: updatedUser.role as UserRole,
-      password: "redacted",
-      email_token: updatedUser.email_token,
-    };
+    delete updatedUser.password;
+    return updatedUser;
   }
 }
