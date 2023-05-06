@@ -63,7 +63,7 @@ export class UserController {
 
   @Post("register")
   async create(@Body(ZodValidationPipe) data: CreateUserDto) {
-    return await this.userService.create(data);
+    return await this.userService.createUser(data);
   }
 
   @Post("confirm-account")

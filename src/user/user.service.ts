@@ -8,6 +8,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/services/prisma.service";
 import { generateUUID } from "src/utils/functions.utils";
 import { password as passwordUtils } from "src/utils/password.utils";
+import { UsersRepository } from "./user.repository";
 import {
   AskResetPasswordResponse,
   ConfirmAccountResponse,
@@ -24,7 +25,8 @@ import {
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private repository: UsersRepository
   ) {}
 
   async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto> {
@@ -51,67 +53,100 @@ export class UserService {
     return this.authService.generateUserToken(user.id, user.role as UserRole);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserDto> {
+  // async create(createUserDto: CreateUserDto): Promise<UserDto> {
+  //   const { firstname, lastname, email, password: passwordDto } = createUserDto;
+  //   const user = await this.prisma.user.create({
+  //     data: {
+  //       firstname,
+  //       lastname,
+  //       email,
+  //       password: await passwordUtils.hash(password),
+  //       role: "USER",
+  //       email_token: generateUUID(),
+  //     },
+  //   });
+
+  //   return {
+  //     id: user.id,
+  //     firstname: user.firstname,
+  //     lastname: user.lastname,
+  //     email: user.email,
+  //     role: user.role as UserRole,
+  //     password: "redacted",
+  //     email_token: user.email_token,
+  //   };
+  // }
+
+  async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     const { firstname, lastname, email, password: passwordDto } = createUserDto;
-    const user = await this.prisma.user.create({
+    const password = await passwordUtils.hash(passwordDto);
+    const email_token = generateUUID();
+    const user = await this.repository.createUser({
       data: {
         firstname,
         lastname,
         email,
-        password: await passwordUtils.hash(password),
+        password,
         role: "USER",
-        email_token: generateUUID(),
+        email_token,
       },
     });
-
-    return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role as UserRole,
-      password: "redacted",
-      email_token: user.email_token,
-    };
+    return user;
   }
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.prisma.user.findMany();
+  // async findAll(): Promise<UserDto[]> {
+  //   const users = await this.prisma.user.findMany();
 
-    return users.map((user) => {
-      return {
-        id: user.id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        role: user.role as UserRole,
-        password: "redacted",
-        email_token: user.email_token,
-      };
-    });
+  //   return users.map((user) => {
+  //     return {
+  //       id: user.id,
+  //       firstname: user.firstname,
+  //       lastname: user.lastname,
+  //       email: user.email,
+  //       role: user.role as UserRole,
+  //       password: "redacted",
+  //       email_token: user.email_token,
+  //     };
+  //   });
+  // }
+
+  async getUsers(): Promise<UserDto[]> {
+    const users = await this.repository.getUsers({});
+    return users;
   }
 
-  async findOne(getUserDto: GetUserDto): Promise<UserDto> {
-    const { id } = getUserDto;
-    const user = await this.prisma.user.findUnique({
+  // async findOne(getUserDto: GetUserDto): Promise<UserDto> {
+  //   const { id } = getUserDto;
+  //   const user = await this.prisma.user.findUnique({
+  //     where: {
+  //       id,
+  //     },
+  //   });
+
+  //   if (!user) {
+  //     throw new NotFoundException("User not found");
+  //   }
+
+  //   return {
+  //     id: user.id,
+  //     firstname: user.firstname,
+  //     lastname: user.lastname,
+  //     email: user.email,
+  //     role: user.role as UserRole,
+  //     password: "redacted",
+  //     email_token: user.email_token,
+  //   };
+  // }
+
+  async getUser(params: GetUserDto): Promise<UserDto> {
+    const { id } = params;
+    const user = await this.repository.getUser({
       where: {
         id,
       },
     });
 
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-
-    return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role as UserRole,
-      password: "redacted",
-      email_token: user.email_token,
-    };
+    return user;
   }
 
   async update(updateUserDto: UpdateUserDto): Promise<UserDto> {
