@@ -1,16 +1,16 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from './services/prisma.service';
-import { ServerHealthcheck } from './app.model';
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { ServerHealthcheck } from "./app.schema";
+import { PrismaService } from "./services/prisma.service";
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
   async healthcheck(): Promise<ServerHealthcheck> {
     return {
       server_status: HttpStatus.OK,
       prisma_status: await this.prismaHealthcheck(),
       timestamp: new Date(),
-    }
+    };
   }
 
   private async prismaHealthcheck(): Promise<number> {

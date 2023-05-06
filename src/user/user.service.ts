@@ -1,21 +1,23 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { LoginUserDto, LoginUserResponseDto } from "./dto/login-user.dto";
-import { UserDto, UserRole } from "./dto/user.dto";
-import { PrismaService } from "src/services/prisma.service";
-import { password } from "src/utils/password.utils";
 import { AuthService } from "src/auth/auth.service";
+import { PrismaService } from "src/services/prisma.service";
 import { generateUUID } from "src/utils/functions.utils";
+import { password as passwordUtils } from "src/utils/password.utils";
 import {
   AskResetPasswordResponse,
   ConfirmAccountResponse,
+  CreateUserDto,
+  GetUserDto,
+  LoginUserDto,
+  LoginUserResponseDto,
+  UpdateUserDto,
+  UserDto,
+  UserRole,
 } from "./users.schema";
 
 @Injectable()
@@ -26,9 +28,10 @@ export class UserService {
   ) {}
 
   async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto> {
+    const { email } = loginUserDto;
     const user = await this.prisma.user.findUnique({
       where: {
-        email: loginUserDto.email,
+        email,
       },
     });
 
@@ -36,7 +39,7 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const isPasswordValid = await password.verify(
+    const isPasswordValid = await passwordUtils.verify(
       loginUserDto.password,
       user.password
     );
@@ -49,23 +52,13 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    // Check if user already exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: createUserDto.email,
-      },
-    });
-
-    if (existingUser) {
-      throw new BadRequestException("User already exists");
-    }
-
+    const { firstname, lastname, email, password: passwordDto } = createUserDto;
     const user = await this.prisma.user.create({
       data: {
-        firstname: createUserDto.firstname,
-        lastname: createUserDto.lastname,
-        email: createUserDto.email,
-        password: await password.hash(createUserDto.password),
+        firstname,
+        lastname,
+        email,
+        password: await passwordUtils.hash(password),
         role: "USER",
         email_token: generateUUID(),
       },
@@ -98,10 +91,11 @@ export class UserService {
     });
   }
 
-  async findOne(id: number): Promise<UserDto> {
+  async findOne(getUserDto: GetUserDto): Promise<UserDto> {
+    const { id } = getUserDto;
     const user = await this.prisma.user.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -120,12 +114,12 @@ export class UserService {
     };
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
-    const { firstname, lastname, email, password, role, email_token } =
+  async update(updateUserDto: UpdateUserDto): Promise<UserDto> {
+    const { id, firstname, lastname, email, password, role, email_token } =
       updateUserDto;
     const user = await this.prisma.user.update({
       where: {
-        id: id,
+        id,
       },
       data: {
         firstname: firstname,
@@ -234,7 +228,7 @@ export class UserService {
         email_token: email_token,
       },
       data: {
-        password: await password.hash(updatedPassword),
+        password: await passwordUtils.hash(updatedPassword),
         email_token: null,
       },
     });

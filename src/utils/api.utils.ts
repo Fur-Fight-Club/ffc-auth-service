@@ -10,9 +10,9 @@ export function prepareRequestUrl(info: RequestInfo): string {
   return typeof info === "string"
     ? info
     : info.hasOwnProperty("href")
-      // @ts-ignore
-      ? (info as URLLike).href
-      : (info as Request).url;
+    ? // @ts-ignore
+      (info as URLLike).href
+    : (info as Request).url;
 }
 
 export function prepareRequestInit(init: RequestInit = {}): RequestInit {
@@ -34,7 +34,7 @@ export interface ApiError {
 export type ApiResponse<T> = T | ApiError;
 
 export function handleApiResponse<T>(
-  response: Response,
+  response: Response
 ): Promise<ApiResponse<T>> {
   return response.json() as Promise<ApiResponse<T>>;
 }
@@ -50,7 +50,7 @@ type ErrorMapper = { [key: string]: ExceptionFactory };
  */
 export function checkApiResponse<T>(
   response: ApiResponse<T>,
-  errorMapper?: ErrorMapper,
+  errorMapper?: ErrorMapper
 ): asserts response is T {
   if (isApiError(response)) {
     console.log("API ERROR STATUS", response.statusCode);
@@ -80,7 +80,7 @@ export function isApiNotFoundError(response: ApiResponse<unknown>): boolean {
 
 export function prepareUrlWithQueryParams<T extends Record<string, unknown>>(
   url: string,
-  params: T,
+  params: T
 ): string {
   const queryParams = prepareQueryParams(params);
   return `${url}${queryParams ? `?${queryParams}` : ""}`;

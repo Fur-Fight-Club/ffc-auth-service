@@ -1,14 +1,22 @@
-import { CanActivate, ExecutionContext, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
-import { JWTServicePayload } from "./auth.model";
-import * as fs from "fs"
-import { ConfigService } from "@nestjs/config";
-
+import * as fs from "fs";
+import { JWTServicePayload } from "./auth.schema";
 
 @Injectable()
 export class UserGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private configService: ConfigService) { }
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -18,13 +26,12 @@ export class UserGuard implements CanActivate {
     }
 
     try {
-      const tokenPayload = await this.jwtService.verifyAsync(token, {
-        algorithms: ['RS256'],
+      const tokenPayload = (await this.jwtService.verifyAsync(token, {
+        algorithms: ["RS256"],
         publicKey: fs.readFileSync("ssl/user-auth-public.pem"),
+      })) as JWTServicePayload;
 
-      }) as JWTServicePayload;
-
-      request['user'] = tokenPayload;
+      request["user"] = tokenPayload;
 
       // TODO users checks ?
 
@@ -35,7 +42,7 @@ export class UserGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+    return type === "Bearer" ? token : undefined;
   }
 }

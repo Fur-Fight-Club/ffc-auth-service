@@ -1,17 +1,13 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from "@nestjs/common";
-import { UserService } from "./user.service";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { LoginUserDto, LoginUserResponseDto } from "./dto/login-user.dto";
 import {
   ApiBearerAuth,
   ApiBody,
@@ -19,7 +15,9 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { ZodValidationPipe } from "nestjs-zod";
 import { ServiceGuard } from "src/auth/auth-service.guard";
+import { UserService } from "./user.service";
 import {
   AskResetPasswordApiBody,
   AskResetPasswordApiResponse,
@@ -28,11 +26,16 @@ import {
   ConfirmAccountApiBody,
   ConfirmAccountDto,
   ConfirmAccountResponse,
+  CreateUserDto,
+  GetUserDto,
+  LoginUserDto,
+  LoginUserResponseDto,
   ResetPasswordApiBody,
   ResetPasswordDto,
+  UpdateUserDto,
+  UserApiReponse,
+  UserDto,
 } from "./users.schema";
-import { ZodValidationPipe } from "nestjs-zod";
-import { UserDto } from "./dto/user.dto";
 
 @ApiHeader({
   name: "x-service-auth",
@@ -54,13 +57,13 @@ export class UserController {
     description: "User logged in successfully",
     type: LoginUserResponseDto,
   })
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.userService.login(loginUserDto);
+  async login(@Body(ZodValidationPipe) data: LoginUserDto) {
+    return await this.userService.login(data);
   }
 
   @Post("register")
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+  async create(@Body(ZodValidationPipe) data: CreateUserDto) {
+    return await this.userService.create(data);
   }
 
   @Post("confirm-account")
@@ -106,7 +109,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: "Password reset successfully",
-    type: UserDto,
+    type: UserApiReponse,
   })
   async resetPassword(
     @Body(ZodValidationPipe) resetPasswordDto: ResetPasswordDto
@@ -123,13 +126,16 @@ export class UserController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string) {
-    return await this.userService.findOne(+id);
+  async findOne(@Body(ZodValidationPipe) data: GetUserDto) {
+    return await this.userService.findOne(data);
   }
 
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(+id, updateUserDto);
+  async update(
+    @Param("id") id: string,
+    @Body(ZodValidationPipe) data: UpdateUserDto
+  ) {
+    return await this.userService.update(data);
   }
 
   @Delete(":id")
