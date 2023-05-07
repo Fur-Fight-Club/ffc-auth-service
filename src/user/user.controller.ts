@@ -129,17 +129,20 @@ export class UserController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") id) {
+  async findOne(@Param("id") id: string) {
     return await this.userService.getUser({ id: +id });
   }
 
-  @Patch(":id")
-  async update(@Param("id") id) {
-    return await this.userService.updateUser({ id: +id });
+  @Patch("update")
+  async update(
+    @Body(ZodValidationPipe) data: UpdateUserDto,
+    @Param("id") id: string
+  ) {
+    return await this.userService.updateUser({ id: +id, ...data });
   }
 
-  @Delete(":id")
-  async remove(@Param("id") id) {
+  @Delete("remove")
+  async remove(@Param("id") id: string) {
     return await this.userService.removeUser({ id: +id });
   }
 }
