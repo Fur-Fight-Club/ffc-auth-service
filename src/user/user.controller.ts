@@ -133,7 +133,7 @@ export class UserController {
     return await this.userService.getUser({ id: +id });
   }
 
-  @Patch("update")
+  @Patch(":id")
   async update(
     @Param("id", ParseIntPipe) id: GetUserDto,
     @Body(ZodValidationPipe) data: UpdateUserDto
