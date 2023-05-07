@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -127,18 +128,18 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
-  @Get("get")
-  async findOne(@Body(ZodValidationPipe) data: GetUserDto) {
-    return await this.userService.getUser(data);
+  @Get(":id")
+  async findOne(@Param("id") id) {
+    return await this.userService.getUser({ id: +id });
   }
 
-  @Patch("update")
-  async update(@Body(ZodValidationPipe) data: UpdateUserDto) {
-    return await this.userService.updateUser(data);
+  @Patch(":id")
+  async update(@Param("id") id) {
+    return await this.userService.updateUser({ id: +id });
   }
 
-  @Delete("remove")
-  async remove(@Body(ZodValidationPipe) data: RemoveUserDto) {
-    return await this.userService.removeUser(data);
+  @Delete(":id")
+  async remove(@Param("id") id) {
+    return await this.userService.removeUser({ id: +id });
   }
 }
