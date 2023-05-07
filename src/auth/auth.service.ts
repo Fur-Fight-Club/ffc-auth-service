@@ -40,7 +40,7 @@ export class AuthService {
       access_token: this.jwtService.sign(payload, {
         algorithm: "RS256",
         expiresIn: "7d",
-        privateKey: fs.readFileSync("ssl/service-auth-private.pem"),
+        privateKey: fs.readFileSync("ssl/user-auth-private.pem"),
       }),
     };
   }
