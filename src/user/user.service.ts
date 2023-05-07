@@ -65,6 +65,11 @@ export class UserService {
         password,
         role: "USER",
         email_token,
+        Wallet: {
+          create: {
+            amount: 0,
+          },
+        },
       },
     });
     return user;
