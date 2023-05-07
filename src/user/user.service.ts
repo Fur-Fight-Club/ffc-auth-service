@@ -37,7 +37,7 @@ export class UserService {
       },
     });
 
-    if (!user) {
+    if (!user || !user.is_email_verified) {
       throw new NotFoundException("User not found");
     }
 
@@ -145,6 +145,7 @@ export class UserService {
       },
       data: {
         email_token: null,
+        is_email_verified: true,
       },
     });
 
