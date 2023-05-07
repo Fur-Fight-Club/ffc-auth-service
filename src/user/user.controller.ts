@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -30,7 +31,6 @@ import {
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
-  RemoveUserDto,
   ResetPasswordApiBody,
   ResetPasswordDto,
   UpdateUserDto,
@@ -129,14 +129,14 @@ export class UserController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string) {
+  async findOne(@Param("id", ParseIntPipe) id: GetUserDto) {
     return await this.userService.getUser({ id: +id });
   }
 
   @Patch("update")
   async update(
-    @Body(ZodValidationPipe) data: UpdateUserDto,
-    @Param("id") id: string
+    @Param("id", ParseIntPipe) id: GetUserDto,
+    @Body(ZodValidationPipe) data: UpdateUserDto
   ) {
     return await this.userService.updateUser({ ...data, id: +id });
   }
