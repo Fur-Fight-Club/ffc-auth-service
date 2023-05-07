@@ -30,9 +30,12 @@ export class UsersRepository {
     });
   }
 
-  async createUser(params: { data: Prisma.UserCreateInput }): Promise<User> {
+  async createUser(params: {
+    data: Prisma.UserCreateInput;
+  }): Promise<Omit<User, "password">> {
     const { data } = params;
-    return this.prisma.user.create({ data });
+    const { password, ...result } = await this.prisma.user.create({ data });
+    return result;
   }
 
   async updateUser(params: {
