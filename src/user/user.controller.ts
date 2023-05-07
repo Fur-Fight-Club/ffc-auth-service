@@ -138,7 +138,7 @@ export class UserController {
     @Body(ZodValidationPipe) data: UpdateUserDto,
     @Param("id") id: string
   ) {
-    return await this.userService.updateUser({ id: +id, ...data });
+    return await this.userService.updateUser({ ...data, id: +id });
   }
 
   @Delete("remove")
