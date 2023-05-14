@@ -15,14 +15,7 @@ jobs:
 
     - name: 🔨 Build .env from GitHub secrets
       run: |
-        echo "APP_PORT='${{ secrets.APP_PORT }}'" >> .env
         echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" >> .env
-        echo "ISSUER='${{ secrets.ISSUER }}'" >> .env
-        echo "FFC_ANALYTICS_URL='${{ secrets.FFC_ANALYTICS_URL }}'" >> .env
-        echo "FFC_AUTH_URL='${{ secrets.FFC_AUTH_URL }}'" >> .env
-        echo "FFC_MAIN_URL='${{ secrets.FFC_MAIN_URL }}'" >> .env
-        echo "FFC_NOTIFICATIONS_URL='${{ secrets.FFC_NOTIFICATIONS_URL }}'" >> .env
-        echo "FFC_PAYMENTS_URL='${{ secrets.FFC_PAYMENTS_URL }}'" >> .env
 
     - name: 🗝️ Create SSL keys from secrets
       run: |
