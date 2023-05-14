@@ -23,6 +23,13 @@ jobs:
         echo "FFC_MAIN_URL='${{ secrets.FFC_MAIN_URL }}'" >> .env
         echo "FFC_NOTIFICATIONS_URL='${{ secrets.FFC_NOTIFICATIONS_URL }}'" >> .env
         echo "FFC_PAYMENTS_URL='${{ secrets.FFC_PAYMENTS_URL }}'" >> .env
+
+    - name: 🗝️ Create SSL keys from secrets
+      run: |
+        echo "${{ secrets.PK_SERVICE }}" > ./ssl/service-auth-public.pem
+        echo "${{ secrets.PK_USER }}" > ./ssl/user-auth-public.pem
+        echo "${{ secrets.SK_SERVICE }}" > ./ssl/service-auth-private.pem
+        echo "${{ secrets.SK_USER }}" > ./ssl/user-auth-private.pem
     
     - name: 🐳 Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
