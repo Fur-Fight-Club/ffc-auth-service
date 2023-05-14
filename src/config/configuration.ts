@@ -14,5 +14,5 @@ export default () => ({
   ffc_main_url: process.env.FFC_MAIN_URL ?? "http://api.ffc.mistergooddeal.org",
   ffc_notifications_url:
     process.env.FFC_NOTIFICATIONS_URL ?? "http://10.102.1.45:4003",
-  ffc_payments_url: process.env.FFC_PAYMENTS_URL ?? "http://localhost:4004",
+  ffc_payments_url: process.env.FFC_PAYMENTS_URL ?? "http://10.102.3.226:4004",
 });
