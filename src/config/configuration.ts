@@ -1,7 +1,7 @@
 export default () => ({
-  app_port: 4002 ?? process.env.APP_PORT,
-  service: "ffc-auth-service",
-  issuer: "http://10.102.3.34:4002" ?? process.env.ISSUER,
+  app_port: process.env.APP_PORT ?? 4002,
+  service: "ffc-notifications-service",
+  issuer: process.env.ISSUER ?? "http://10.102.3.34:4002",
   authorizedServices: [
     "ffc-analytics-service",
     "ffc-auth-service",
@@ -9,10 +9,10 @@ export default () => ({
     "ffc-notifications-service",
     "ffc-payments-service",
   ],
-  ffc_analytics_url: "http://localhost:4001" ?? process.env.FFC_ANALYTICS_URL,
-  ffc_auth_url: "http://10.102.3.34:4002" ?? process.env.FFC_AUTH_URL,
-  ffc_main_url: "http://api.ffc.mistergooddeal.org" ?? process.env.FFC_MAIN_URL,
+  ffc_analytics_url: process.env.FFC_ANALYTICS_URL ?? "http://localhost:4001",
+  ffc_auth_url: process.env.FFC_AUTH_URL ?? "http://10.102.3.34:4002",
+  ffc_main_url: process.env.FFC_MAIN_URL ?? "http://api.ffc.mistergooddeal.org",
   ffc_notifications_url:
-    "http://10.102.1.45:4003" ?? process.env.FFC_NOTIFICATIONS_URL,
-  ffc_payments_url: "http://localhost:4004" ?? process.env.FFC_PAYMENTS_URL,
+    process.env.FFC_NOTIFICATIONS_URL ?? "http://10.102.1.45:4003",
+  ffc_payments_url: process.env.FFC_PAYMENTS_URL ?? "http://localhost:4004",
 });
