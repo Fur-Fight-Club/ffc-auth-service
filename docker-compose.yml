@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ffc-main:
+    build:
+      dockerfile: Dockerfile
+    image: nestjs
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - '4002:4002'
+    volumes:
+      - .:/app
+      - /app/node_modules
