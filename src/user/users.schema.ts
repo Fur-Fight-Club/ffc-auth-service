@@ -6,18 +6,19 @@ export const userRoleSchema = z.enum(["ADMIN", "USER", "MONSTER_OWNER"]);
 
 export const userSchema = z.object({
   id: z.number(),
-  firstname: z.string(),
-  lastname: z.string(),
-  email: z.string().email(),
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  email: z.string().email().optional(),
   password: z
     .password()
     .min(8)
     .atLeastOne("digit")
     .atLeastOne("lowercase")
     .atLeastOne("uppercase")
-    .atLeastOne("special"),
-  role: userRoleSchema,
-  email_token: z.string(),
+    .atLeastOne("special")
+    .optional(),
+  role: userRoleSchema.optional(),
+  email_token: z.string().optional(),
 });
 
 export class UserApiReponse {
@@ -89,6 +90,35 @@ const removeUserSchema = userSchema.pick({
   id: true,
 });
 
+const updatePasswordUserSchema = z.object({
+  id: z.number(),
+  oldPassword: z
+    .password()
+    .min(8)
+    .atLeastOne("digit")
+    .atLeastOne("lowercase")
+    .atLeastOne("uppercase")
+    .atLeastOne("special"),
+  password: z
+    .password()
+    .min(8)
+    .atLeastOne("digit")
+    .atLeastOne("lowercase")
+    .atLeastOne("uppercase")
+    .atLeastOne("special"),
+  verifPassword: z
+    .password()
+    .min(8)
+    .atLeastOne("digit")
+    .atLeastOne("lowercase")
+    .atLeastOne("uppercase")
+    .atLeastOne("special"),
+});
+
+export class UpdatePasswordUserDto extends createZodDto(
+  updatePasswordUserSchema
+) {}
+
 export class CreateUserDto extends createZodDto(createUserSchema) {}
 
 export class LoginUserDto extends createZodDto(loginUserSchema) {}
@@ -126,6 +156,8 @@ export class ConfirmAccountApiBody {
 }
 
 export type ConfirmAccountResponse = Promise<boolean>;
+
+export type ConfirmChangePasswordResponse = Promise<boolean>;
 
 /**
  * ASK RESET PASSWORD TYPES

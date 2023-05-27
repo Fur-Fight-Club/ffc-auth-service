@@ -33,6 +33,7 @@ import {
   LoginUserResponseDto,
   ResetPasswordApiBody,
   ResetPasswordDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
   UserApiReponse,
   UserDto,
@@ -134,11 +135,23 @@ export class UserController {
   }
 
   @Patch(":id")
+  @UseGuards(ServiceGuard)
+  @ApiBearerAuth()
   async update(
     @Param("id", ParseIntPipe) id: GetUserDto,
     @Body(ZodValidationPipe) data: UpdateUserDto
   ) {
     return await this.userService.updateUser({ ...data, id: +id });
+  }
+
+  @Patch(":id/password")
+  @UseGuards(ServiceGuard)
+  @ApiBearerAuth()
+  async updatePassword(
+    @Param("id", ParseIntPipe) id: GetUserDto,
+    @Body(ZodValidationPipe) data: UpdatePasswordUserDto
+  ) {
+    return await this.userService.updatePasswordUser({ ...data, id: +id });
   }
 
   @Delete("remove")
