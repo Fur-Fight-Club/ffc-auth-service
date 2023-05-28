@@ -127,7 +127,6 @@ export class UserService {
       },
     });
 
-    delete user.password;
     return user;
   }
 
