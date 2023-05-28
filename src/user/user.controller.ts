@@ -28,6 +28,7 @@ import {
   ConfirmAccountDto,
   ConfirmAccountResponse,
   CreateUserDto,
+  DeleteUserDto,
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
@@ -141,8 +142,8 @@ export class UserController {
     return await this.userService.updateUser({ ...data, id: +id });
   }
 
-  @Delete("remove")
-  async remove(@Param("id") id: string) {
+  @Delete(":id")
+  async remove(@Param("id", ParseIntPipe) id: DeleteUserDto) {
     return await this.userService.removeUser({ id: +id });
   }
 }

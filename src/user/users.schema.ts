@@ -75,6 +75,10 @@ const getUserSchema = userSchema.pick({
   id: true,
 });
 
+const deleteUserSchema = userSchema.pick({
+  id: true,
+});
+
 const updateUserSchema = userSchema.pick({
   id: true,
   firstname: true,
@@ -102,6 +106,8 @@ export class UpdateUserDto extends createZodDto(updateUserSchema) {}
 export class RemoveUserDto extends createZodDto(removeUserSchema) {}
 
 export class GetUserDto extends createZodDto(getUserSchema) {}
+
+export class DeleteUserDto extends createZodDto(deleteUserSchema) {}
 
 export type UserRole = z.infer<typeof userRoleSchema>;
 
