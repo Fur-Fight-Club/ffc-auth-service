@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ffc-auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ffc-auth
+  template:
+    metadata:
+      labels:
+        app: ffc-auth
+    spec:
+      containers:
+        - name: ffc-auth
+          image: mcamus9/ffc-auth-docker
+          ports:
+            - containerPort: 4002

@@ -12,14 +12,17 @@ import { UsersRepository } from "./user.repository";
 import {
   AskResetPasswordResponse,
   ConfirmAccountResponse,
+  ConfirmChangePasswordResponse,
   CreateUserDto,
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
   UserDto,
   UserRole,
 } from "./users.schema";
+import { identity } from "rxjs";
 
 @Injectable()
 export class UserService {
@@ -124,7 +127,6 @@ export class UserService {
       },
     });
 
-    delete user.password;
     return user;
   }
 
@@ -217,5 +219,55 @@ export class UserService {
 
     delete updatedUser.password;
     return updatedUser;
+  }
+
+  async updatePasswordUser(
+    updatedPassword: UpdatePasswordUserDto
+  ): ConfirmChangePasswordResponse {
+    const user = await this.repository.getUser({
+      where: {
+        id: updatedPassword.id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    // Check if old password is valid
+    const isPasswordValid = await passwordUtils.verify(
+      updatedPassword.oldPassword,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    // check if new password is different from old password
+    const isNewPasswordDifferent = await passwordUtils.verify(
+      updatedPassword.password,
+      user.password
+    );
+
+    if (isNewPasswordDifferent) {
+      throw new UnauthorizedException("New password must be different");
+    }
+
+    //update password
+    const updatedUser = await this.repository.updateUser({
+      where: {
+        id: updatedPassword.id,
+      },
+      data: {
+        password: await passwordUtils.hash(updatedPassword.password),
+      },
+    });
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException("Error while updating password");
+    }
+
+    return true;
   }
 }

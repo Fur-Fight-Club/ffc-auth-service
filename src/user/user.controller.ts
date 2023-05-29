@@ -28,11 +28,13 @@ import {
   ConfirmAccountDto,
   ConfirmAccountResponse,
   CreateUserDto,
+  DeleteUserDto,
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
   ResetPasswordApiBody,
   ResetPasswordDto,
+  UpdatePasswordUserDto,
   UpdateUserDto,
   UserApiReponse,
   UserDto,
@@ -134,6 +136,8 @@ export class UserController {
   }
 
   @Patch(":id")
+  @UseGuards(ServiceGuard)
+  @ApiBearerAuth()
   async update(
     @Param("id", ParseIntPipe) id: GetUserDto,
     @Body(ZodValidationPipe) data: UpdateUserDto
@@ -141,8 +145,18 @@ export class UserController {
     return await this.userService.updateUser({ ...data, id: +id });
   }
 
-  @Delete("remove")
-  async remove(@Param("id") id: string) {
+  @Patch(":id/password")
+  @UseGuards(ServiceGuard)
+  @ApiBearerAuth()
+  async updatePassword(
+    @Param("id", ParseIntPipe) id: GetUserDto,
+    @Body(ZodValidationPipe) data: UpdatePasswordUserDto
+  ) {
+    return await this.userService.updatePasswordUser({ ...data, id: +id });
+  }
+
+  @Delete(":id")
+  async remove(@Param("id", ParseIntPipe) id: DeleteUserDto) {
     return await this.userService.removeUser({ id: +id });
   }
 }
