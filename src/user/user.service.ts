@@ -22,7 +22,6 @@ import {
   UserDto,
   UserRole,
 } from "./users.schema";
-import { identity } from "rxjs";
 
 @Injectable()
 export class UserService {
@@ -32,8 +31,8 @@ export class UserService {
     private repository: UsersRepository
   ) {}
 
-  async login(params: LoginUserDto): Promise<LoginUserResponseDto> {
-    const { email } = params;
+  async login(body: LoginUserDto): Promise<LoginUserResponseDto> {
+    const { email, password } = body;
     const user = await this.repository.getUser({
       where: {
         email,
@@ -44,10 +43,7 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const isPasswordValid = await passwordUtils.verify(
-      params.password,
-      user.password
-    );
+    const isPasswordValid = await passwordUtils.verify(password, user.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid credentials");
