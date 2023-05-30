@@ -95,8 +95,8 @@ export class UserService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto): Promise<UserDto> {
-    const { id, firstname, lastname, email, password, role, email_token } =
-      updateUserDto;
+    const { id, firstname, lastname, email, role, email_token } = updateUserDto;
+
     const user = await this.repository.updateUser({
       where: {
         id,
@@ -105,7 +105,6 @@ export class UserService {
         firstname: firstname,
         lastname: lastname,
         email: email,
-        password: password,
         role: role,
         email_token: email_token,
       },
