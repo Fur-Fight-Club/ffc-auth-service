@@ -85,7 +85,6 @@ const updateUserSchema = userSchema.pick({
   firstname: true,
   lastname: true,
   email: true,
-  password: true,
   role: true,
   email_token: true,
 });

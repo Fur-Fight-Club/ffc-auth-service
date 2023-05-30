@@ -1,6 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import * as express from "express";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -24,6 +25,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>("app_port");
+
+  app.use(express.json());
 
   await app.listen(port);
 
