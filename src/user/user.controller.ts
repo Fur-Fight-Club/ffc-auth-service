@@ -155,8 +155,18 @@ export class UserController {
     return await this.userService.updatePasswordUser({ ...data, id: +id });
   }
 
-  @Delete(":id")
-  async remove(@Param("id", ParseIntPipe) id: DeleteUserDto) {
+  @Patch(":id/email")
+  @UseGuards(ServiceGuard)
+  @ApiBearerAuth()
+  async updateEmail(
+    @Param("id", ParseIntPipe) id: GetUserDto,
+    @Body(ZodValidationPipe) data: UpdateUserDto
+  ) {
+    return await this.userService.updateEmailUser({ ...data, id: +id });
+  }
+
+  @Delete("remove")
+  async remove(@Param("id") id: string) {
     return await this.userService.removeUser({ id: +id });
   }
 }

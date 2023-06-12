@@ -12,11 +12,13 @@ import { UsersRepository } from "./user.repository";
 import {
   AskResetPasswordResponse,
   ConfirmAccountResponse,
+  ConfirmChangeEmailResponse,
   ConfirmChangePasswordResponse,
   CreateUserDto,
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
+  UpdateEmailUserDto,
   UpdatePasswordUserDto,
   UpdateUserDto,
   UserDto,
@@ -261,6 +263,44 @@ export class UserService {
 
     if (!updatedUser) {
       throw new InternalServerErrorException("Error while updating password");
+    }
+
+    return true;
+  }
+
+  // update email
+  async updateEmailUser(
+    updatedEmail: UpdateEmailUserDto
+  ): ConfirmChangeEmailResponse {
+    const user = await this.repository.getUser({
+      where: {
+        id: updatedEmail.id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    // Check if old email is different from new email
+    if (user.email === updatedEmail.email) {
+      throw new UnauthorizedException("New email must be different");
+    }
+
+    //update email
+    const updatedUser = await this.repository.updateUser({
+      where: {
+        id: updatedEmail.id,
+      },
+      data: {
+        email: updatedEmail.email,
+        email_token: generateUUID(),
+        is_email_verified: false,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException("Error while updating email");
     }
 
     return true;

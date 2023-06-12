@@ -109,13 +109,6 @@ const updatePasswordUserSchema = z.object({
     .atLeastOne("lowercase")
     .atLeastOne("uppercase")
     .atLeastOne("special"),
-  verifPassword: z
-    .password()
-    .min(8)
-    .atLeastOne("digit")
-    .atLeastOne("lowercase")
-    .atLeastOne("uppercase")
-    .atLeastOne("special"),
 });
 
 export class UpdatePasswordUserDto extends createZodDto(
@@ -213,3 +206,15 @@ export class ResetPasswordApiBody {
   @ApiProperty({ type: "string", format: "password" })
   password: string;
 }
+
+/**
+ * UPDATE EMAIL
+ */
+
+export const updateEmail = z.object({
+  id: z.number(),
+  email: z.string().email(),
+});
+
+export class UpdateEmailUserDto extends createZodDto(updateEmail) {}
+export type ConfirmChangeEmailResponse = Promise<boolean>;
