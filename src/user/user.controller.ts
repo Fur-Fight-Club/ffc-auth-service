@@ -28,7 +28,6 @@ import {
   ConfirmAccountDto,
   ConfirmAccountResponse,
   CreateUserDto,
-  DeleteUserDto,
   GetUserDto,
   LoginUserDto,
   LoginUserResponseDto,
