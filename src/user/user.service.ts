@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -58,6 +59,16 @@ export class UserService {
     const { firstname, lastname, email, password: passwordDto } = createUserDto;
     const password = await passwordUtils.hash(passwordDto);
     const email_token = generateUUID();
+    const existingUser = await this.repository.getUser({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) {
+      throw new ConflictException("L'email est déjà utilisé");
+    }
+
     const user = await this.repository.createUser({
       data: {
         firstname,
