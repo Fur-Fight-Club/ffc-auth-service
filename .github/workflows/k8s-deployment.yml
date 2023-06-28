@@ -61,3 +61,4 @@ jobs:
       run: |
         gcloud container clusters get-credentials fury-fight-club --region europe-west1 --project fury-fight-club-386613
         kubectl set image deployment/ffc-auth-deployment ffc-auth=mcamus9/ffc-auth-docker:latest
+        kubectl rollout restart deployment/ffc-auth-deployment
