@@ -18,7 +18,7 @@ export const userSchema = z.object({
     .atLeastOne("special")
     .optional(),
   role: userRoleSchema.optional(),
-  email_token: z.string().optional(),
+  email_token: z.string().nullable().optional(),
 });
 
 export class UserApiReponse {
@@ -53,7 +53,7 @@ export class UserApiReponse {
     type: "string",
     default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   })
-  email_token: string;
+  email_token: string | null;
 }
 
 const createUserSchema = userSchema.pick({
@@ -150,7 +150,7 @@ export class ConfirmAccountApiBody {
     type: "string",
     default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   })
-  email_token: string;
+  email_token: string | null;
 }
 
 export type ConfirmAccountResponse = Promise<boolean>;
@@ -177,11 +177,11 @@ export class AskResetPasswordApiResponse {
     type: "string",
     default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   })
-  email_token: string;
+  email_token: string | null;
 }
 
 export type AskResetPasswordResponse = Promise<{
-  email_token: string;
+  email_token: string | null;
 }>;
 
 /**
@@ -201,8 +201,7 @@ export class ResetPasswordApiBody {
     type: "string",
     default: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   })
-  email_token: string;
-
+  email_token: string | null;
   @ApiProperty({ type: "string", format: "password" })
   password: string;
 }

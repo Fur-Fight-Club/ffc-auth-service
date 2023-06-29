@@ -164,8 +164,8 @@ export class UserController {
     return await this.userService.updateEmailUser({ ...data, id: +id });
   }
 
-  @Delete("remove")
-  async remove(@Param("id") id: string) {
+  @Delete(":id")
+  async remove(@Param("id", ParseIntPipe) id: string) {
     return await this.userService.removeUser({ id: +id });
   }
 }
