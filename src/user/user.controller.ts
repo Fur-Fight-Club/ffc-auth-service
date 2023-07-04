@@ -34,7 +34,6 @@ import {
   ResetPasswordApiBody,
   ResetPasswordDto,
   UpdateEmailUserDto,
-  UpdatePasswordUserDto,
   UpdateUserDto,
   UserApiReponse,
   UserDto,
