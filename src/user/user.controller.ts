@@ -149,8 +149,8 @@ export class UserController {
   @UseGuards(ServiceGuard)
   @ApiBearerAuth()
   async updatePassword(
-    @Param("id") id: string,
-    @Body() data: UpdateEmailUserDto
+    @Param("id", ParseIntPipe) id: GetUserDto,
+    @Body() data: UpdatePasswordUserDto
   ) {
     return await this.userService.updatePasswordUser({ ...data, id: +id });
   }
@@ -160,7 +160,7 @@ export class UserController {
   @ApiBearerAuth()
   async updateEmail(
     @Param("id", ParseIntPipe) id: GetUserDto,
-    @Body(ZodValidationPipe) data: UpdateUserDto
+    @Body(ZodValidationPipe) data: UpdateEmailUserDto
   ) {
     return await this.userService.updateEmailUser({ ...data, id: +id });
   }
