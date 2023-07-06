@@ -242,16 +242,6 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    // Check if old password is valid
-    const isPasswordValid = await passwordUtils.verify(
-      updatedPassword.oldPassword,
-      user.password
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException("Invalid credentials");
-    }
-
     // check if new password is different from old password
     const isNewPasswordDifferent = await passwordUtils.verify(
       updatedPassword.password,
