@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "*" 
+
+jobs:
+  checkout-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout project
+      uses: actions/checkout@v2
+
+    - name: 🔨 Build .env from GitHub secrets
+      run: |
+        echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" >> .env
+
+    - name: 📦 Install dependencies
+      run: npm install
+
+    - name: 🧪 Execute tests
+      run: npm run test
