@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "*" 
+
+jobs:
+  checkout-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout project
+      uses: actions/checkout@v2
+
+    - name: 🔨 Build .env from GitHub secrets
+      run: |
+        echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" >> .env
+
+    - name: 🗝️ Create SSL keys from secrets
+      run: |
+        echo "${{ secrets.PK_SERVICE }}" > ./ssl/service-auth-public.pem
+        echo "${{ secrets.PK_USER }}" > ./ssl/user-auth-public.pem
+        echo "${{ secrets.SK_SERVICE }}" > ./ssl/service-auth-private.pem
+        echo "${{ secrets.SK_USER }}" > ./ssl/user-auth-private.pem
+
+    - name: 📦 Install dependencies
+      run: npm install
+
+    - name: 🧪 Execute tests
+      run: npm run test
